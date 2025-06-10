@@ -1,0 +1,20 @@
+
+.card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #f4f4f4;
+}
+
+button {
+  margin-top: 0.5rem;
+}
+
+.MuiTableCell-head {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.MuiTableRow-root:hover {
+  background-color: blanchedalmond;
+}

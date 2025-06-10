@@ -48,8 +48,8 @@ const Cart = () => {
  
 // const Maps_API_KEY =import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-const Maps_API_KEY ='AIzaSyCuqOu8NjS4Bp2keZoS8e2VcxSiIEIkdaM';
-
+// const Maps_API_KEY ='AIzaSyCuqOu8NjS4Bp2keZoS8e2VcxSiIEIkdaM';
+const Maps_API_KEY=VITE_GOOGLE_MAPS_API_KEY
   const handleConfirmedLocation = (locationData) => {
     setSelectedLocation(locationData);
     setOpenMapModal(false); 

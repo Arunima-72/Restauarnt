@@ -81,24 +81,40 @@ router.get('/delivery/:deliveryId', verifyToken, checkRole('delivery'), async (r
 });
 
 // ✅ 5. Update order status (Admin & Delivery)
-router.put("/orders/:id", async (req, res) => { // Admin has full control
-  try {
-    const { status } = req.body;
-    const orderId = req.params.userId;
+router.put("/:id/update-status", verifyToken, isAdmin, async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
 
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
+  try {
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
     order.status = status;
     await order.save();
-    res.json(order);
+
+    res.json({ message: "Status updated", order });
   } catch (err) {
-    console.error("Error updating order status:", err);
-    res.status(500).json({ message: "Error updating order status", error: err.message });
+    res.status(500).json({ message: "Error updating status", error: err.message });
   }
 });
+// router.put("/orders/:id", async (req, res) => { // Admin has full control
+//   try {
+//     const { status } = req.body;
+//     const orderId = req.params.id;
+
+//     const order = await Order.findById(orderId);
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
+//     }
+
+//     order.status = status;
+//     await order.save();
+//     res.json(order);
+//   } catch (err) {
+//     console.error("Error updating order status:", err);
+//     res.status(500).json({ message: "Error updating order status", error: err.message });
+//   }
+// });
 
 // ✅ 6. Admin assigns a delivery person to an order
 // PUT /orders/:id/assign
@@ -106,7 +122,7 @@ router.put('/:id/assign', async (req, res) => {
   const { deliveryId } = req.body;
   try {
     const order = await Order.findByIdAndUpdate(
-      req.params.userId,
+      req.params.id,
       {
         deliveryPerson: deliveryId,
         status: 'assigned'
@@ -159,31 +175,52 @@ router.put('/orders/:id', async (req, res) => {
 // });
 
 // ✅ 7. Mark order as delivered (can free delivery partner) - Used by delivery person
-router.put("/:id/mark-delivered", verifyToken, checkRole('delivery'), async (req, res) => { // Changed to checkRole('delivery')
-  try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ message: "Order not found" });
+// router.put("/:id/mark-delivered", verifyToken, checkRole('delivery'), async (req, res) => { // Changed to checkRole('delivery')
+//   try {
+//     const order = await Order.findById(req.params.id);
+//     if (!order) return res.status(404).json({ message: "Order not found" });
 
-    if (req.user.id !== order.deliveryPerson?.toString()) { // Use req.user.id
-        return res.status(403).json({ message: "Access denied. You can only mark your assigned orders as delivered." });
+//     if (req.user.id !== order.deliveryPerson?.toString()) { // Use req.user.id
+//         return res.status(403).json({ message: "Access denied. You can only mark your assigned orders as delivered." });
+//     }
+
+//     order.status = "delivered";
+//     order.paymentStatus = "paid";
+//     await order.save();
+
+//     if (order.deliveryPerson) {
+//       await User.findByIdAndUpdate(order.deliveryPerson, { isAvailable: true });
+//     }
+
+//     res.json(order);
+//   } catch (err) {
+//     console.error("Error marking order as delivered:", err);
+//     res.status(500).json({ message: "Error marking order as delivered", error: err.message });
+//   }
+// });
+router.put('/:id/update-status-delivery', verifyToken, checkRole('delivery'), async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const { status } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    if (order.deliveryPerson?.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'You can only update status of your assigned orders' });
     }
 
-    order.status = "delivered";
-    order.paymentStatus = "paid";
+    order.status = status;
     await order.save();
 
-    if (order.deliveryPerson) {
-      await User.findByIdAndUpdate(order.deliveryPerson, { isAvailable: true });
-    }
-
-    res.json(order);
+    res.json({ message: 'Order status updated', order });
   } catch (err) {
-    console.error("Error marking order as delivered:", err);
-    res.status(500).json({ message: "Error marking order as delivered", error: err.message });
+    console.error('Error updating delivery status:', err);
+    res.status(500).json({ message: 'Failed to update status', error: err.message });
   }
 });
 
-router.put('/user/availability',async (req, res) => {
+router.put('/user/availability',verifyToken,async (req, res) => {
   const userId = req.user.userId; // from JWT
   const { available } = req.body;
   const user = await User.findByIdAndUpdate(userId, { available }, { new: true });

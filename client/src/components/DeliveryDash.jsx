@@ -55,7 +55,7 @@ const fetchOrders = async () => {
 };
   const toggleAvailability = async () => {
     try {
-      const res = await axiosInstance.put("http://localhost:3000/user/availability", {
+      const res = await axiosInstance.put("http://localhost:3000/orders/user/availability", {
         available: !availability
       }, {
         headers: { token }
@@ -82,21 +82,36 @@ const fetchOrders = async () => {
       toast.error("Failed to accept order");
     }
   };
+const handleStatusChange = async (orderId, newStatus) => {
+  try {
+    await axiosInstance.put(`http://localhost:3000/orders/${orderId}/update-status-delivery`, {
+      status: newStatus
+    }, {
+      headers: { token }
+    });
+    toast.success("Status updated");
+    fetchOrders();
+  } catch (err) {
+    console.error("Error updating status:", err);
+    toast.error("Failed to update status");
+  }
+};
 
-  const handleStatusChange = async (orderId, newStatus) => {
-    try {
-      await axiosInstance.put(`http://localhost:3000/orders/${orderId}`, {
-        status: newStatus
-      }, {
-        headers: { token }
-      });
-      toast.success("Status updated");
-      fetchOrders();
-    } catch (err) {
-      console.error("Error updating status:", err);
-      toast.error("Failed to update status");
-    }
-  };
+
+  // const handleStatusChange = async (orderId, newStatus) => {
+  //   try {
+  //     await axiosInstance.put(`http://localhost:3000/orders/${orderId}`, {
+  //       status: newStatus
+  //     }, {
+  //       headers: { token }
+  //     });
+  //     toast.success("Status updated");
+  //     fetchOrders();
+  //   } catch (err) {
+  //     console.error("Error updating status:", err);
+  //     toast.error("Failed to update status");
+  //   }
+  // };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -196,6 +211,9 @@ const fetchOrders = async () => {
                       Accept Order
                     </Button>
                   )}
+{/* <Button onClick={() => handleStatusChange(order._id)}>
+  Mark as Delivered
+</Button> */}
 
                   <FormControl fullWidth sx={{ mt: 2 }}>
                     <InputLabel>Status</InputLabel>

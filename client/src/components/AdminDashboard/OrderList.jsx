@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import axiosInstance from '../../axiosInterceptor';
+import { Box, Typography } from '@mui/material';
 // import './AdminOrdersList.css'; // Optional: for custom styles
 
 const AdminOrdersList = () => {
@@ -18,7 +19,7 @@ const AdminOrdersList = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/orders');
+      const res = await axiosInstance.get('http://localhost:3000/orders');
       if (Array.isArray(res.data)) {
         setOrders(res.data);
       } else {
@@ -32,7 +33,7 @@ const AdminOrdersList = () => {
 
   const fetchDeliveryUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/users?role=delivery');
+      const res = await axiosInstance.get('http://localhost:3000/users?role=delivery');
       setDeliveryUsers(res.data);
     } catch (err) {
       toast.error('Failed to fetch delivery boys');
@@ -42,7 +43,7 @@ const AdminOrdersList = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axiosInstance.put(`http://localhost:3000/orders/${orderId}`, { status: newStatus });
+      await axiosInstance.put(`http://localhost:3000/orders/${orderId}/update-status`, { status: newStatus });
       toast.success(`Status updated to ${newStatus}`);
       fetchOrders();
     } catch (err) {
@@ -72,22 +73,24 @@ const AdminOrdersList = () => {
   const totalPages = Math.ceil(orders.length / ordersPerPage);
 
   return (
+    <Box sx={{ p: 3 }}  style={{backgroundImage:"url('/images/reshome2.jpg')"}}>
+     
     <div className="container mt-5">
-      <h2 className="mb-4 text-center">🧾 All Orders</h2>
+      <h2 className="mb-4 text-center" style={{color:"orange"}}>🧾 All Orders</h2>
 
       <div className="table-responsive">
         <table className="table table-hover table-bordered shadow-sm">
-          <thead className="table-dark">
+          <thead >
             <tr>
-              <th>Order ID</th>
-              <th>User</th>
-              <th>Items</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Payment</th>
-              <th>Assign Delivery</th>
-              <th>Delivery</th>
-              <th>Actions</th>
+              <th style={{color:"orange"}}>Order ID</th>
+              <th style={{color:"orange"}}>User</th>
+              <th style={{color:"orange"}}>Items</th>
+              <th style={{color:"orange"}}>Total</th>
+              <th style={{color:"orange"}}>Status</th>
+              <th style={{color:"orange"}}>Payment</th>
+              <th style={{color:"orange"}}>Assign Delivery</th>
+              <th style={{color:"orange"}}>Delivery</th>
+              <th style={{color:"orange"}}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -158,7 +161,7 @@ const AdminOrdersList = () => {
       </div>
 
       {/* Pagination Controls */}
-      {/* <div className="d-flex justify-content-between align-items-center mt-3">
+      <div className="d-flex justify-content-between align-items-center mt-3">
         <button
           className="btn btn-secondary"
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -174,8 +177,9 @@ const AdminOrdersList = () => {
         >
           Next ➡
         </button>
-      </div> */}
+      </div>
     </div>
+    </Box>
   );
 };
 

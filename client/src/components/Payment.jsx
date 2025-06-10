@@ -78,7 +78,7 @@ const Payment = () => {
 const handleDownloadReceipt = async () => {
   const doc = new jsPDF();
 
-  const logo = await toBase64('/logo.png');
+  const logo = await toBase64('../images/logo.png');
 
   doc.addImage(logo, 'PNG', 15, 10, 30, 20);
   doc.setFontSize(18);
@@ -176,19 +176,19 @@ const handleDownloadReceipt = async () => {
   //   doc.save('FoodieBites_Receipt.pdf');
   // };
 
-  // // Utility to convert image to base64
-  // const toBase64 = (url) => {
-  //   return new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-  //     fetch(url)
-  //       .then(res => res.blob())
-  //       .then(blob => {
-  //         reader.readAsDataURL(blob);
-  //         reader.onloadend = () => resolve(reader.result);
-  //         reader.onerror = reject;
-  //       });
-  //   });
-  // };
+  // Utility to convert image to base64
+  const toBase64 = (url) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      fetch(url)
+        .then(res => res.blob())
+        .then(blob => {
+          reader.readAsDataURL(blob);
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+        });
+    });
+  };
 
   return (
     <div style={{
